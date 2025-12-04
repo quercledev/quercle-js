@@ -11,3 +11,12 @@ export type {
   FetchResponse,
   SearchResponse,
 } from "./types.js";
+export {
+  FIELD_DESCRIPTIONS,
+  TOOL_DESCRIPTIONS,
+  searchToolSchema,
+  fetchToolSchema,
+  searchToolDefinition,
+  fetchToolDefinition,
+} from "./tools.js";
+export type { SearchToolInput, FetchToolInput } from "./tools.js";
