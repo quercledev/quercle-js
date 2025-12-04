@@ -1,0 +1,58 @@
+{
+  "name": "quercle",
+  "version": "0.1.0",
+  "description": "Official JavaScript/TypeScript SDK for the Quercle API - AI-powered web search and fetching",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "format": "prettier --write src",
+    "test": "bun test",
+    "prepublishOnly": "bun run typecheck && bun run lint && bun run build"
+  },
+  "keywords": [
+    "quercle",
+    "api",
+    "ai",
+    "search",
+    "web",
+    "fetch",
+    "typescript"
+  ],
+  "author": "Quercle <support@quercle.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quercledev/quercle-js.git"
+  },
+  "homepage": "https://quercle.dev",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/bun": "latest",
+    "@types/node": "^22.10.2",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.2"
+  }
+}
