@@ -8,6 +8,8 @@ import {
   QuercleError,
   AuthenticationError,
   InsufficientCreditsError,
+  InactiveAccountError,
+  NotFoundError,
   TimeoutError,
 } from "./errors.js";
 
@@ -179,7 +181,9 @@ export class QuercleClient {
       case 402:
         throw new InsufficientCreditsError(detail);
       case 403:
-        throw new QuercleError("Account inactive", 403, detail);
+        throw new InactiveAccountError(detail);
+      case 404:
+        throw new NotFoundError(detail);
       case 504:
         throw new TimeoutError(detail);
       default:

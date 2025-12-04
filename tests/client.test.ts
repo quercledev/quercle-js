@@ -11,6 +11,7 @@ import {
   QuercleError,
   AuthenticationError,
   InsufficientCreditsError,
+  InactiveAccountError,
   TimeoutError,
 } from "../src/index";
 import {
@@ -263,19 +264,21 @@ describe("QuercleClient", () => {
       );
     });
 
-    test("throws QuercleError on 403", async () => {
+    test("throws InactiveAccountError on 403", async () => {
       const client = new QuercleClient({
         apiKey: "qk_inactive",
         baseUrl: MOCK_BASE_URL,
       });
 
-      await expect(client.search("query")).rejects.toThrow(QuercleError);
+      await expect(client.search("query")).rejects.toThrow(InactiveAccountError);
       try {
         await client.search("query");
       } catch (error) {
-        expect(error).toBeInstanceOf(QuercleError);
-        expect((error as QuercleError).statusCode).toBe(403);
-        expect((error as QuercleError).message).toBe("Account inactive");
+        expect(error).toBeInstanceOf(InactiveAccountError);
+        expect((error as InactiveAccountError).statusCode).toBe(403);
+        expect((error as InactiveAccountError).message).toBe(
+          "Account is inactive. Contact support at https://quercle.dev"
+        );
       }
     });
 

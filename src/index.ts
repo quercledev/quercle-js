@@ -3,6 +3,8 @@ export {
   QuercleError,
   AuthenticationError,
   InsufficientCreditsError,
+  InactiveAccountError,
+  NotFoundError,
   TimeoutError,
 } from "./errors.js";
 export type {

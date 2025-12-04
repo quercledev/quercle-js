@@ -100,7 +100,7 @@ export type FetchToolInput = z.infer<typeof fetchToolSchema>;
  * Includes name, description, and Zod schema.
  */
 export const searchToolDefinition = {
-  name: "quercle_search",
+  name: "search",
   description: TOOL_DESCRIPTIONS.SEARCH,
   parameters: searchToolSchema,
 } as const;
@@ -110,7 +110,7 @@ export const searchToolDefinition = {
  * Includes name, description, and Zod schema.
  */
 export const fetchToolDefinition = {
-  name: "quercle_fetch",
+  name: "fetch",
   description: TOOL_DESCRIPTIONS.FETCH,
   parameters: fetchToolSchema,
 } as const;

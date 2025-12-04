@@ -41,6 +41,28 @@ export class InsufficientCreditsError extends QuercleError {
 }
 
 /**
+ * Error thrown when the account is inactive (403).
+ */
+export class InactiveAccountError extends QuercleError {
+  constructor(detail?: string) {
+    super("Account is inactive. Contact support at https://quercle.dev", 403, detail);
+    this.name = "InactiveAccountError";
+    Object.setPrototypeOf(this, InactiveAccountError.prototype);
+  }
+}
+
+/**
+ * Error thrown when a resource is not found (404).
+ */
+export class NotFoundError extends QuercleError {
+  constructor(detail?: string) {
+    super("Resource not found", 404, detail);
+    this.name = "NotFoundError";
+    Object.setPrototypeOf(this, NotFoundError.prototype);
+  }
+}
+
+/**
  * Error thrown when a request times out (504).
  */
 export class TimeoutError extends QuercleError {
