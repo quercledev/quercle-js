@@ -58,11 +58,11 @@ export const searchToolSchema = z.object({
     .min(1)
     .max(1000)
     .describe(FIELD_DESCRIPTIONS.SEARCH_QUERY),
-  allowed_domains: z
+  allowedDomains: z
     .array(z.string())
     .optional()
     .describe(FIELD_DESCRIPTIONS.ALLOWED_DOMAINS),
-  blocked_domains: z
+  blockedDomains: z
     .array(z.string())
     .optional()
     .describe(FIELD_DESCRIPTIONS.BLOCKED_DOMAINS),
