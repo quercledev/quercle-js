@@ -5,17 +5,17 @@ Official JavaScript/TypeScript SDK for the [Quercle API](https://quercle.dev) - 
 ## Installation
 
 ```bash
-npm install quercle
+npm install @quercle/sdk
 # or
-bun add quercle
+bun add @quercle/sdk
 # or
-yarn add quercle
+yarn add @quercle/sdk
 ```
 
 ## Quick Start
 
 ```typescript
-import { QuercleClient } from "quercle";
+import { QuercleClient } from "@quercle/sdk";
 
 // Create a client (uses QUERCLE_API_KEY env var by default)
 const client = new QuercleClient();
@@ -53,7 +53,7 @@ const client = new QuercleClient({
 ### Using the `createClient` helper
 
 ```typescript
-import { createClient } from "quercle";
+import { createClient } from "@quercle/sdk";
 
 // Uses QUERCLE_API_KEY environment variable
 const client = createClient();
@@ -114,7 +114,7 @@ import {
   AuthenticationError,
   InsufficientCreditsError,
   TimeoutError,
-} from "quercle";
+} from "@quercle/sdk";
 
 const client = new QuercleClient({ apiKey: "qk_..." });
 
@@ -161,7 +161,7 @@ import type {
   SearchOptions,
   FetchResponse,
   SearchResponse,
-} from "quercle";
+} from "@quercle/sdk";
 ```
 
 ## Requirements

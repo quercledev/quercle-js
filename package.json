@@ -1,5 +1,5 @@
 {
-  "name": "quercle",
+  "name": "@quercle/sdk",
   "version": "0.1.0",
   "description": "Official JavaScript/TypeScript SDK for the Quercle API - AI-powered web search and fetching",
   "type": "module",
