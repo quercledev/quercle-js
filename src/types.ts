@@ -33,7 +33,7 @@ export interface SearchOptions {
 
   /**
    * Exclude results from these domains.
-   * Supports wildcards (e.g., ['spam.com', '*.example.org'])
+   * Supports wildcards (e.g., ['*.example.com', '*.example.org'])
    */
   blockedDomains?: string[];
 }

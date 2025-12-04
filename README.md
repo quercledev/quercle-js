@@ -98,8 +98,8 @@ const answer = await client.search("What is TypeScript?");
 
 // Search with domain filtering
 const filtered = await client.search("Python best practices", {
-  allowedDomains: ["*.python.org", "realpython.com"],
-  blockedDomains: ["spam.com"],
+  allowedDomains: ["*.edu", "*.gov"],
+  blockedDomains: ["*.example.org"],
 });
 ```
 

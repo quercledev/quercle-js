@@ -97,7 +97,7 @@ export class QuercleClient {
    *
    * // Search with domain filtering
    * const filtered = await client.search("Python best practices", {
-   *   allowedDomains: ["*.python.org", "realpython.com"],
+   *   allowedDomains: ["*.edu", "*.gov"],
    * });
    * ```
    */
