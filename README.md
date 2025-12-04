@@ -151,6 +151,57 @@ All errors include:
 - `statusCode`: HTTP status code
 - `detail`: Additional error details from the API (if available)
 
+## AI Framework Integration
+
+The SDK exports tool definitions and Zod schemas for easy integration with AI frameworks like Vercel AI SDK, LangChain, etc.
+
+```typescript
+import {
+  QuercleClient,
+  // Tool descriptions
+  TOOL_DESCRIPTIONS,
+  FIELD_DESCRIPTIONS,
+  // Zod schemas
+  searchToolSchema,
+  fetchToolSchema,
+  // Complete tool definitions
+  searchToolDefinition,
+  fetchToolDefinition,
+} from "@quercle/sdk";
+```
+
+### Example: Vercel AI SDK
+
+```typescript
+import { tool } from "ai";
+import { QuercleClient, TOOL_DESCRIPTIONS, searchToolSchema } from "@quercle/sdk";
+
+const client = new QuercleClient();
+
+const searchTool = tool({
+  description: TOOL_DESCRIPTIONS.SEARCH,
+  parameters: searchToolSchema,
+  execute: async ({ query, allowed_domains, blocked_domains }) => {
+    return client.search(query, {
+      allowedDomains: allowed_domains,
+      blockedDomains: blocked_domains,
+    });
+  },
+});
+```
+
+### Available Exports
+
+| Export | Description |
+|--------|-------------|
+| `TOOL_DESCRIPTIONS.SEARCH` | Description for the search tool |
+| `TOOL_DESCRIPTIONS.FETCH` | Description for the fetch tool |
+| `FIELD_DESCRIPTIONS.*` | Descriptions for individual fields |
+| `searchToolSchema` | Zod schema for search parameters |
+| `fetchToolSchema` | Zod schema for fetch parameters |
+| `searchToolDefinition` | Complete tool definition (name, description, schema) |
+| `fetchToolDefinition` | Complete tool definition (name, description, schema) |
+
 ## TypeScript Support
 
 The SDK is written in TypeScript and exports all types:
