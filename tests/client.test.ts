@@ -15,10 +15,9 @@ import {
   TimeoutError,
 } from "../src/index";
 import {
-  MOCK_BASE_URL,
   TEST_API_KEY,
-  startMockServer,
-  stopMockServer,
+  mockFetch,
+  restoreFetch,
   resetMockState,
   setFetchMode,
   setSearchMode,
@@ -29,11 +28,11 @@ import {
 
 describe("QuercleClient", () => {
   beforeAll(() => {
-    startMockServer();
+    mockFetch();
   });
 
   afterAll(() => {
-    stopMockServer();
+    restoreFetch();
   });
 
   beforeEach(() => {
@@ -94,14 +93,6 @@ describe("QuercleClient", () => {
       }
     });
 
-    test("accepts custom baseUrl", () => {
-      const client = new QuercleClient({
-        apiKey: TEST_API_KEY,
-        baseUrl: "https://custom.api.com",
-      });
-      expect(client).toBeDefined();
-    });
-
     test("accepts custom timeout", () => {
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
@@ -115,7 +106,6 @@ describe("QuercleClient", () => {
     test("returns string result from successful fetch", async () => {
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
-        baseUrl: MOCK_BASE_URL,
       });
       const result = await client.fetch("https://example.com", "Summarize");
       expect(typeof result).toBe("string");
@@ -127,7 +117,6 @@ describe("QuercleClient", () => {
 
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
-        baseUrl: MOCK_BASE_URL,
       });
 
       await expect(
@@ -142,7 +131,6 @@ describe("QuercleClient", () => {
     test("sends correct request body", async () => {
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
-        baseUrl: MOCK_BASE_URL,
       });
 
       await client.fetch("https://example.com", "Extract the title");
@@ -157,7 +145,6 @@ describe("QuercleClient", () => {
     test("returns string result from successful search", async () => {
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
-        baseUrl: MOCK_BASE_URL,
       });
       const result = await client.search("What is TypeScript?");
       expect(typeof result).toBe("string");
@@ -169,7 +156,6 @@ describe("QuercleClient", () => {
 
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
-        baseUrl: MOCK_BASE_URL,
       });
 
       await expect(client.search("query")).rejects.toThrow(QuercleError);
@@ -178,7 +164,6 @@ describe("QuercleClient", () => {
     test("includes allowedDomains in request body", async () => {
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
-        baseUrl: MOCK_BASE_URL,
       });
 
       await client.search("Python best practices", {
@@ -196,7 +181,6 @@ describe("QuercleClient", () => {
     test("includes blockedDomains in request body", async () => {
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
-        baseUrl: MOCK_BASE_URL,
       });
 
       await client.search("query", {
@@ -213,7 +197,6 @@ describe("QuercleClient", () => {
     test("omits empty allowedDomains array", async () => {
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
-        baseUrl: MOCK_BASE_URL,
       });
 
       await client.search("query", { allowedDomains: [] });
@@ -228,7 +211,6 @@ describe("QuercleClient", () => {
     test("omits undefined options", async () => {
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
-        baseUrl: MOCK_BASE_URL,
       });
 
       await client.search("query");
@@ -247,7 +229,6 @@ describe("QuercleClient", () => {
     test("throws AuthenticationError on 401", async () => {
       const client = new QuercleClient({
         apiKey: "qk_invalid",
-        baseUrl: MOCK_BASE_URL,
       });
 
       await expect(client.search("query")).rejects.toThrow(AuthenticationError);
@@ -256,7 +237,6 @@ describe("QuercleClient", () => {
     test("throws InsufficientCreditsError on 402", async () => {
       const client = new QuercleClient({
         apiKey: "qk_no_credits",
-        baseUrl: MOCK_BASE_URL,
       });
 
       await expect(client.search("query")).rejects.toThrow(
@@ -267,7 +247,6 @@ describe("QuercleClient", () => {
     test("throws InactiveAccountError on 403", async () => {
       const client = new QuercleClient({
         apiKey: "qk_inactive",
-        baseUrl: MOCK_BASE_URL,
       });
 
       await expect(client.search("query")).rejects.toThrow(InactiveAccountError);
@@ -288,7 +267,6 @@ describe("QuercleClient", () => {
 
       const client = new QuercleClient({
         apiKey: TEST_API_KEY,
-        baseUrl: MOCK_BASE_URL,
         timeout: 100, // Very short timeout
       });
 
@@ -298,7 +276,6 @@ describe("QuercleClient", () => {
     test("error objects have correct properties", async () => {
       const client = new QuercleClient({
         apiKey: "qk_invalid",
-        baseUrl: MOCK_BASE_URL,
       });
 
       try {
@@ -310,22 +287,6 @@ describe("QuercleClient", () => {
         expect((error as AuthenticationError).statusCode).toBe(401);
         expect((error as AuthenticationError).name).toBe("AuthenticationError");
         expect((error as AuthenticationError).detail).toBe("Invalid API key");
-      }
-    });
-
-    test("throws QuercleError on network error", async () => {
-      const client = new QuercleClient({
-        apiKey: TEST_API_KEY,
-        baseUrl: "http://localhost:9999", // Non-existent server
-      });
-
-      await expect(client.search("query")).rejects.toThrow(QuercleError);
-      try {
-        await client.search("query");
-      } catch (error) {
-        expect(error).toBeInstanceOf(QuercleError);
-        expect((error as QuercleError).message).toContain("Network error");
-        expect((error as QuercleError).statusCode).toBe(0);
       }
     });
   });

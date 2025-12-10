@@ -11,11 +11,6 @@ export interface QuercleConfig {
   apiKey?: string;
 
   /**
-   * Base URL for the Quercle API. Defaults to https://quercle.dev
-   */
-  baseUrl?: string;
-
-  /**
    * Request timeout in milliseconds. Defaults to 120000 (2 minutes).
    */
   timeout?: number;

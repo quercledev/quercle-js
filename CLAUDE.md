@@ -94,7 +94,6 @@ import { z } from "zod";
 
 export interface QuercleConfig {
   apiKey?: string;
-  baseUrl?: string;
   timeout?: number;
 }
 
@@ -170,12 +169,11 @@ import {
   TimeoutError,
 } from "./errors.js";
 
-const DEFAULT_BASE_URL = "https://quercle.dev";
+const BASE_URL = "https://quercle.dev";
 const DEFAULT_TIMEOUT = 120000; // 120 seconds
 
 export class QuercleClient {
   private readonly apiKey: string;
-  private readonly baseUrl: string;
   private readonly timeout: number;
 
   constructor(config: QuercleConfig = {}) {
@@ -184,7 +182,6 @@ export class QuercleClient {
       throw new AuthenticationError("API key is required");
     }
     this.apiKey = apiKey.trim();
-    this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/$/, "");
     this.timeout = config.timeout ?? DEFAULT_TIMEOUT;
   }
 
@@ -242,7 +239,7 @@ export class QuercleClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -309,7 +306,7 @@ export class QuercleClient {
 
 /**
  * Create a Quercle client from environment variables.
- * Reads QUERCLE_API_KEY and optionally QUERCLE_BASE_URL.
+ * Reads QUERCLE_API_KEY from environment.
  */
 export function createClient(config?: Partial<QuercleConfig>): QuercleClient {
   return new QuercleClient(config);

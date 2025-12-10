@@ -42,9 +42,6 @@ const client = new QuercleClient({
   // API key (falls back to QUERCLE_API_KEY env var)
   apiKey: "qk_...",
 
-  // Base URL (optional, defaults to https://quercle.dev)
-  baseUrl: "https://quercle.dev",
-
   // Request timeout in ms (optional, defaults to 120000)
   timeout: 120000,
 });
