@@ -26,7 +26,7 @@ This is the core library that framework integrations (LangChain.js, Vercel AI SD
 
 ### Endpoints
 
-**POST https://quercle.dev/api/v1/fetch**
+**POST https://api.quercle.dev/v1/fetch**
 
 Fetch a web page and analyze its content using AI. Provide a URL and a prompt describing what information you want to extract or how to analyze the content. The raw HTML is NOT returned - only the AI's analysis based on your prompt.
 
@@ -40,7 +40,7 @@ Fetch a web page and analyze its content using AI. Provide a URL and a prompt de
 {"result": "AI-processed content..."}
 ```
 
-**POST https://quercle.dev/api/v1/search**
+**POST https://api.quercle.dev/v1/search**
 
 Search the web and get an AI-synthesized answer with citations. The response includes the answer and source URLs that can be fetched for further investigation. Optionally filter by allowed or blocked domains.
 
@@ -194,7 +194,7 @@ export class QuercleClient {
    * @returns AI-processed analysis of the page content
    */
   async fetch(url: string, prompt: string): Promise<string> {
-    const data = await this.request("/api/v1/fetch", { url, prompt });
+    const data = await this.request("/v1/fetch", { url, prompt });
     const response = FetchResponseSchema.safeParse(data);
     if (!response.success) {
       throw new QuercleError("Invalid response from API", 500);
@@ -223,7 +223,7 @@ export class QuercleClient {
       body.blocked_domains = options.blockedDomains;
     }
 
-    const data = await this.request("/api/v1/search", body);
+    const data = await this.request("/v1/search", body);
     const response = SearchResponseSchema.safeParse(data);
     if (!response.success) {
       throw new QuercleError("Invalid response from API", 500);

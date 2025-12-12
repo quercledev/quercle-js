@@ -1,4 +1,4 @@
-export { QuercleClient, createClient } from "./client.js";
+export { QuercleClient, createClient, BASE_URL } from "./client.js";
 export {
   QuercleError,
   AuthenticationError,

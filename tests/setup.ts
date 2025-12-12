@@ -1,3 +1,5 @@
+import { BASE_URL } from "../src/index";
+
 export const TEST_API_KEY = "qk_test_12345";
 
 // Shared state for request capturing
@@ -58,14 +60,14 @@ export function getLastSearchBody(): unknown {
 }
 
 /**
- * Mock the global fetch to intercept requests to quercle.dev.
+ * Mock the global fetch to intercept requests to the Quercle API.
  */
 export function mockFetch(): void {
   globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === "string" ? input : input.toString();
 
-    // Only intercept quercle.dev requests
-    if (!url.includes("quercle.dev")) {
+    // Only intercept Quercle API requests
+    if (!url.startsWith(BASE_URL)) {
       return originalFetch(input, init);
     }
 
@@ -100,7 +102,7 @@ export function mockFetch(): void {
     const body = init?.body ? JSON.parse(init.body as string) : {};
 
     // Handle fetch endpoint
-    if (url.includes("/api/v1/fetch")) {
+    if (url.includes("/v1/fetch")) {
       lastFetchBody = body;
 
       if (fetchMode === "invalid") {
@@ -121,7 +123,7 @@ export function mockFetch(): void {
     }
 
     // Handle search endpoint
-    if (url.includes("/api/v1/search")) {
+    if (url.includes("/v1/search")) {
       lastSearchBody = body;
 
       if (searchMode === "invalid") {

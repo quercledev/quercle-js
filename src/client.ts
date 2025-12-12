@@ -13,7 +13,11 @@ import {
   TimeoutError,
 } from "./errors.js";
 
-const BASE_URL = "https://quercle.dev";
+export const BASE_URL = "https://api.quercle.dev";
+const ENDPOINTS = {
+  FETCH: "/v1/fetch",
+  SEARCH: "/v1/search",
+} as const;
 const DEFAULT_TIMEOUT = 120000; // 120 seconds
 
 /**
@@ -70,7 +74,7 @@ export class QuercleClient {
    * ```
    */
   async fetch(url: string, prompt: string): Promise<string> {
-    const data = await this.request("/api/v1/fetch", { url, prompt });
+    const data = await this.request(ENDPOINTS.FETCH, { url, prompt });
     const response = FetchResponseSchema.safeParse(data);
     if (!response.success) {
       throw new QuercleError("Invalid response from API", 500);
@@ -111,7 +115,7 @@ export class QuercleClient {
       body.blocked_domains = options.blockedDomains;
     }
 
-    const data = await this.request("/api/v1/search", body);
+    const data = await this.request(ENDPOINTS.SEARCH, body);
     const response = SearchResponseSchema.safeParse(data);
     if (!response.success) {
       throw new QuercleError("Invalid response from API", 500);
