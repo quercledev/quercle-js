@@ -135,7 +135,7 @@ export class QuercleClient {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": this.apiKey,
+          Authorization: `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify(body),
         signal: controller.signal,

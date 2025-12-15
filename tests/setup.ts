@@ -79,12 +79,13 @@ export function mockFetch(): void {
       throw error;
     }
 
-    // Check API key header
+    // Check API key header (Authorization: Bearer <key>)
     const headers = new Headers(init?.headers);
-    const apiKey = headers.get("X-API-Key");
-    if (!apiKey) {
+    const authHeader = headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return Response.json({ detail: "Missing API key" }, { status: 401 });
     }
+    const apiKey = authHeader.substring(7); // Remove "Bearer " prefix
     if (apiKey === "qk_invalid") {
       return Response.json({ detail: "Invalid API key" }, { status: 401 });
     }
