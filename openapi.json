@@ -1,0 +1,1146 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Quercle API",
+    "description": "AI-powered web fetching and search API. Fetch content from any URL, perform web searches, and get AI-synthesized answers with source citations.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Quercle API",
+      "url": "https://quercle.dev"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.quercle.dev",
+      "description": "Production"
+    }
+  ],
+  "tags": [
+    {
+      "name": "API",
+      "description": "Main API endpoints"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API Key",
+        "description": "API key authentication. Include the key in the Authorization header as 'Bearer YOUR_API_KEY'"
+      }
+    }
+  },
+  "paths": {
+    "/v1/fetch": {
+      "post": {
+        "operationId": "postV1Fetch",
+        "description": "Fetch a URL and return an AI-synthesized answer based on page content and your prompt.",
+        "x-credit-cost": 1,
+        "tags": [
+          "API"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fetch completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "AI-synthesized answer based on the fetched page and your prompt."
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Unique request identifier for debugging",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Rate limit per minute for this user",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Remaining requests in current rate limit window",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Unix timestamp when rate limit window resets",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid URL, prompt, or request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required - insufficient credits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests - rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Rate limit error details."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "description": "Additional validation or error context."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until rate limit resets",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "maxLength": 2048,
+                    "format": "uri",
+                    "description": "The URL to fetch and analyze."
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 10000,
+                    "description": "Instructions for how to analyze the page content. Be specific about what information you want to extract."
+                  }
+                },
+                "required": [
+                  "url",
+                  "prompt"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/search": {
+      "post": {
+        "operationId": "postV1Search",
+        "description": "Search the web and return an AI-synthesized answer from the retrieved results.",
+        "x-credit-cost": 5,
+        "tags": [
+          "API"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "AI-synthesized answer based on web search results."
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Unique request identifier for debugging",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Rate limit per minute for this user",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Remaining requests in current rate limit window",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Unix timestamp when rate limit window resets",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid query or domain format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required - insufficient credits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests - rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Rate limit error details."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "description": "Additional validation or error context."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until rate limit resets",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000,
+                    "description": "The search query to find information about. Be specific."
+                  },
+                  "allowed_domains": {
+                    "description": "Only include results from these domains (e.g., ['example.com', 'docs.example.org']).",
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 253,
+                      "pattern": "^[a-z0-9][a-z0-9.-]*[a-z0-9]$"
+                    }
+                  },
+                  "blocked_domains": {
+                    "description": "Exclude results from these domains (e.g., ['example.com', 'docs.example.org']).",
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 253,
+                      "pattern": "^[a-z0-9][a-z0-9.-]*[a-z0-9]$"
+                    }
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/raw_fetch": {
+      "post": {
+        "operationId": "postV1RawFetch",
+        "description": "Fetch a URL and return raw markdown or HTML.",
+        "x-credit-cost": {
+          "markdown": 1,
+          "html": 1,
+          "markdown_with_safeguard": 2
+        },
+        "tags": [
+          "API"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Raw fetch completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "Fetched content."
+                    },
+                    "unsafe": {
+                      "description": "True when safeguard marks content as unsafe.",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Unique request identifier for debugging",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Rate limit per minute for this user",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Remaining requests in current rate limit window",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Unix timestamp when rate limit window resets",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid URL, format, or request payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required - insufficient credits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests - rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Rate limit error details."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "description": "Additional validation or error context."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until rate limit resets",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "maxLength": 2048,
+                    "format": "uri",
+                    "description": "The URL to fetch."
+                  },
+                  "format": {
+                    "description": "Output format for fetched content. Defaults to `markdown`.",
+                    "type": "string",
+                    "enum": [
+                      "markdown",
+                      "html"
+                    ]
+                  },
+                  "use_safeguard": {
+                    "description": "Enable prompt-injection detection when `format` is `markdown`.",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "url"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/raw_search": {
+      "post": {
+        "operationId": "postV1RawSearch",
+        "description": "Run web search and return raw results.",
+        "x-credit-cost": {
+          "default": 1,
+          "with_safeguard": 2
+        },
+        "tags": [
+          "API"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Raw search completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "result": {
+                          "type": "string",
+                          "description": "Search results markdown (`format=markdown`)."
+                        },
+                        "unsafe": {
+                          "description": "True when safeguard marks content as unsafe.",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "result"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "result": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "title": {
+                                "type": "string",
+                                "description": "Search result title."
+                              },
+                              "url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "Search result URL."
+                              },
+                              "content": {
+                                "type": "string",
+                                "description": "Search result snippet text."
+                              }
+                            },
+                            "required": [
+                              "title",
+                              "url",
+                              "content"
+                            ]
+                          },
+                          "description": "Search results list (`format=json`)."
+                        },
+                        "unsafe": {
+                          "description": "True when safeguard marks content as unsafe.",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "result"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Unique request identifier for debugging",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Rate limit per minute for this user",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Remaining requests in current rate limit window",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Unix timestamp when rate limit window resets",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid query, format, or request payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required - insufficient credits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests - rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Rate limit error details."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "description": "Additional validation or error context."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until rate limit resets",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000,
+                    "description": "The search query to run against the web."
+                  },
+                  "format": {
+                    "description": "Output format for search results. Defaults to `markdown`.",
+                    "type": "string",
+                    "enum": [
+                      "markdown",
+                      "json"
+                    ]
+                  },
+                  "use_safeguard": {
+                    "description": "Enable prompt-injection detection on search results.",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/extract": {
+      "post": {
+        "operationId": "postV1Extract",
+        "description": "Fetch a URL and return chunks relevant to a query.",
+        "x-credit-cost": {
+          "default": 1,
+          "with_safeguard": 2
+        },
+        "tags": [
+          "API"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Extract completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "result": {
+                          "type": "string",
+                          "description": "Relevant chunks markdown (`format=markdown`)."
+                        },
+                        "unsafe": {
+                          "description": "True when safeguard marks content as unsafe.",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "result"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "result": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "description": "A relevant extracted chunk."
+                          },
+                          "description": "Relevant chunks array (`format=json`)."
+                        },
+                        "unsafe": {
+                          "description": "True when safeguard marks content as unsafe.",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "result"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Unique request identifier for debugging",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Rate limit per minute for this user",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Remaining requests in current rate limit window",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Unix timestamp when rate limit window resets",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid URL, query, format, or request payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required - insufficient credits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests - rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Rate limit error details."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "description": "Additional validation or error context."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until rate limit resets",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string",
+                      "description": "Human-readable error message."
+                    }
+                  },
+                  "required": [
+                    "detail"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "maxLength": 2048,
+                    "format": "uri",
+                    "description": "The URL to fetch and extract relevant chunks from."
+                  },
+                  "query": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000,
+                    "description": "What information to extract from the page content."
+                  },
+                  "format": {
+                    "description": "Output format for extracted chunks. Defaults to `markdown`.",
+                    "type": "string",
+                    "enum": [
+                      "markdown",
+                      "json"
+                    ]
+                  },
+                  "use_safeguard": {
+                    "description": "Enable prompt-injection detection on selected extracted content.",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "url",
+                  "query"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
