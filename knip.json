@@ -1,0 +1,7 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["src/index.ts"],
+  "project": ["src/**/*.ts"],
+  "ignore": ["src/**/*.gen.ts", "src/client/**", "src/core/**"],
+  "ignoreDependencies": ["@biomejs/biome", "tsup"]
+}
