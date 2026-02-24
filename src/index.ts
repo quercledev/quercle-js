@@ -1,24 +1,17 @@
-export { QuercleClient, createClient, BASE_URL } from "./client.js";
-export {
-  QuercleError,
-  AuthenticationError,
-  InsufficientCreditsError,
-  InactiveAccountError,
-  NotFoundError,
-  TimeoutError,
-} from "./errors.js";
+export { QuercleApiError, QuercleClient, quercle } from "./quercle";
 export type {
-  QuercleConfig,
+  ExtractOptions,
+  QuercleClientOptions,
+  RawFetchOptions,
+  RawSearchOptions,
   SearchOptions,
+} from "./quercle";
+export type {
+  ExtractResponse,
   FetchResponse,
+  RawFetchResponse,
+  RawSearchResponse,
   SearchResponse,
-} from "./types.js";
-export {
-  FIELD_DESCRIPTIONS,
-  TOOL_DESCRIPTIONS,
-  searchToolSchema,
-  fetchToolSchema,
-  searchToolDefinition,
-  fetchToolDefinition,
-} from "./tools.js";
-export type { SearchToolInput, FetchToolInput } from "./tools.js";
+} from "./types.gen";
+export { toolMetadata } from "./tool-metadata";
+export type { ToolMetadata } from "./tool-metadata";
