@@ -1,6 +1,7 @@
 export { QuercleApiError, QuercleClient, quercle } from "./quercle";
 export type {
   ExtractOptions,
+  FetchOptions,
   QuercleClientOptions,
   RawFetchOptions,
   RawSearchOptions,
