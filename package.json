@@ -1,6 +1,6 @@
 {
   "name": "@quercle/sdk",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Official generated JavaScript/TypeScript SDK for Quercle API.",
   "type": "module",
   "main": "dist/index.cjs",

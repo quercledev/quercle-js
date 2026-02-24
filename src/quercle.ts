@@ -39,24 +39,32 @@ type RawFetchFormat = NonNullable<RawFetchData["body"]>["format"];
 type RawSearchFormat = NonNullable<RawSearchData["body"]>["format"];
 type ExtractFormat = NonNullable<ExtractData["body"]>["format"];
 
+export interface FetchOptions {
+  timeoutMs?: number;
+}
+
 export interface SearchOptions {
   allowedDomains?: string[];
   blockedDomains?: string[];
+  timeoutMs?: number;
 }
 
 export interface RawFetchOptions {
   format?: RawFetchFormat;
   useSafeguard?: boolean;
+  timeoutMs?: number;
 }
 
 export interface RawSearchOptions {
   format?: RawSearchFormat;
   useSafeguard?: boolean;
+  timeoutMs?: number;
 }
 
 export interface ExtractOptions {
   format?: ExtractFormat;
   useSafeguard?: boolean;
+  timeoutMs?: number;
 }
 
 export interface QuercleClientOptions {
@@ -105,6 +113,57 @@ function resolveBaseUrl(baseUrl?: string): string {
   return baseUrl ?? readEnv(BASE_URL_ENV) ?? DEFAULT_BASE_URL;
 }
 
+type FetchImplementation = NonNullable<Config["fetch"]>;
+type FetchInput = Parameters<FetchImplementation>[0];
+type FetchInit = Parameters<FetchImplementation>[1];
+
+function resolveFetchImplementation(fetchImpl?: Config["fetch"]): FetchImplementation {
+  return (fetchImpl ?? globalThis.fetch) as FetchImplementation;
+}
+
+function createTimeoutFetch(fetchImpl: FetchImplementation, timeoutMs?: number): FetchImplementation {
+  if (typeof timeoutMs !== "number" || !Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+    return fetchImpl;
+  }
+
+  return async (input: FetchInput, init?: FetchInit): Promise<Response> => {
+    if (typeof AbortController === "undefined") {
+      return fetchImpl(input, init);
+    }
+
+    const controller = new AbortController();
+    const upstreamSignal = init?.signal;
+    const onAbort = () => controller.abort();
+
+    if (upstreamSignal) {
+      if (upstreamSignal.aborted) {
+        controller.abort();
+      } else {
+        upstreamSignal.addEventListener("abort", onAbort, { once: true });
+      }
+    }
+
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetchImpl(input, {
+        ...init,
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+      upstreamSignal?.removeEventListener("abort", onAbort);
+    }
+  };
+}
+
+function resolveCallFetch(fetchImpl: FetchImplementation, timeoutMs?: number): Config["fetch"] | undefined {
+  if (typeof timeoutMs !== "number" || !Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+    return undefined;
+  }
+
+  return createTimeoutFetch(fetchImpl, timeoutMs);
+}
+
 function extractErrorDetail(error: unknown): string | undefined {
   if (typeof error === "string" && error.trim()) {
     return error;
@@ -132,25 +191,33 @@ function unwrapResult<TData, TError>(operation: string, result: OperationResult<
 
 export class QuercleClient {
   private readonly client: Client;
+  private readonly fetchImpl: FetchImplementation;
 
   constructor(options: QuercleClientOptions = {}) {
     if (options.client) {
       this.client = options.client;
+      const clientFetch = options.client.getConfig().fetch;
+      this.fetchImpl = resolveFetchImplementation(options.fetch ?? clientFetch);
       return;
     }
+
+    const resolvedFetch = resolveFetchImplementation(options.fetch);
+    this.fetchImpl = resolvedFetch;
 
     this.client = createClient({
       auth: resolveApiKey(options.apiKey),
       baseUrl: resolveBaseUrl(options.baseUrl),
-      fetch: options.fetch,
+      fetch: resolvedFetch,
       headers: options.headers,
     });
   }
 
-  async fetch(url: string, prompt: string): Promise<FetchResponse> {
+  async fetch(url: string, prompt: string, options: FetchOptions = {}): Promise<FetchResponse> {
+    const callFetch = resolveCallFetch(this.fetchImpl, options.timeoutMs);
     const result = await fetchOperation({
       client: this.client,
       body: { prompt, url },
+      fetch: callFetch,
     });
     return unwrapResult<FetchResponse, FetchError>("fetch", result);
   }
@@ -164,9 +231,11 @@ export class QuercleClient {
       body.blocked_domains = options.blockedDomains;
     }
 
+    const callFetch = resolveCallFetch(this.fetchImpl, options.timeoutMs);
     const result = await searchOperation({
       client: this.client,
       body,
+      fetch: callFetch,
     });
 
     return unwrapResult<SearchResponse, SearchError>("search", result);
@@ -181,9 +250,11 @@ export class QuercleClient {
       body.use_safeguard = options.useSafeguard;
     }
 
+    const callFetch = resolveCallFetch(this.fetchImpl, options.timeoutMs);
     const result = await rawFetchOperation({
       client: this.client,
       body,
+      fetch: callFetch,
     });
 
     return unwrapResult<RawFetchResponse, RawFetchError>("raw_fetch", result);
@@ -198,9 +269,11 @@ export class QuercleClient {
       body.use_safeguard = options.useSafeguard;
     }
 
+    const callFetch = resolveCallFetch(this.fetchImpl, options.timeoutMs);
     const result = await rawSearchOperation({
       client: this.client,
       body,
+      fetch: callFetch,
     });
 
     return unwrapResult<RawSearchResponse, RawSearchError>("raw_search", result);
@@ -215,9 +288,11 @@ export class QuercleClient {
       body.use_safeguard = options.useSafeguard;
     }
 
+    const callFetch = resolveCallFetch(this.fetchImpl, options.timeoutMs);
     const result = await extractOperation({
       client: this.client,
       body,
+      fetch: callFetch,
     });
 
     return unwrapResult<ExtractResponse, ExtractError>("extract", result);
