@@ -57,9 +57,22 @@ export type FetchErrors = {
          */
         detail: string;
         /**
-         * Additional validation or error context.
+         * Additional validation issue details.
          */
-        errors?: Array<unknown>;
+        errors?: Array<{
+            /**
+             * Validation issue code.
+             */
+            code: string;
+            /**
+             * Path to the invalid field.
+             */
+            path: Array<string | number>;
+            /**
+             * Validation issue message.
+             */
+            message: string;
+        }>;
     };
     /**
      * Internal server error
@@ -145,9 +158,22 @@ export type SearchErrors = {
          */
         detail: string;
         /**
-         * Additional validation or error context.
+         * Additional validation issue details.
          */
-        errors?: Array<unknown>;
+        errors?: Array<{
+            /**
+             * Validation issue code.
+             */
+            code: string;
+            /**
+             * Path to the invalid field.
+             */
+            path: Array<string | number>;
+            /**
+             * Validation issue message.
+             */
+            message: string;
+        }>;
     };
     /**
      * Internal server error
@@ -233,9 +259,22 @@ export type RawFetchErrors = {
          */
         detail: string;
         /**
-         * Additional validation or error context.
+         * Additional validation issue details.
          */
-        errors?: Array<unknown>;
+        errors?: Array<{
+            /**
+             * Validation issue code.
+             */
+            code: string;
+            /**
+             * Path to the invalid field.
+             */
+            path: Array<string | number>;
+            /**
+             * Validation issue message.
+             */
+            message: string;
+        }>;
     };
     /**
      * Internal server error
@@ -325,9 +364,22 @@ export type RawSearchErrors = {
          */
         detail: string;
         /**
-         * Additional validation or error context.
+         * Additional validation issue details.
          */
-        errors?: Array<unknown>;
+        errors?: Array<{
+            /**
+             * Validation issue code.
+             */
+            code: string;
+            /**
+             * Path to the invalid field.
+             */
+            path: Array<string | number>;
+            /**
+             * Validation issue message.
+             */
+            message: string;
+        }>;
     };
     /**
      * Internal server error
@@ -443,9 +495,22 @@ export type ExtractErrors = {
          */
         detail: string;
         /**
-         * Additional validation or error context.
+         * Additional validation issue details.
          */
-        errors?: Array<unknown>;
+        errors?: Array<{
+            /**
+             * Validation issue code.
+             */
+            code: string;
+            /**
+             * Path to the invalid field.
+             */
+            path: Array<string | number>;
+            /**
+             * Validation issue message.
+             */
+            message: string;
+        }>;
     };
     /**
      * Internal server error

@@ -21,6 +21,14 @@ const response = await client.search("latest bun release notes");
 console.log(response.result);
 ```
 
+## Timeouts
+
+```ts
+const result = await client.search("latest bun release notes", {
+  timeoutMs: 20_000,
+});
+```
+
 ## Tool Metadata
 
 ```ts
